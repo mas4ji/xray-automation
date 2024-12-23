@@ -1,11 +1,22 @@
 import os
 import subprocess
 
+# Menampilkan pesan ASCII di awal skrip
+def display_message():
+    print("""
+██╗░░██╗██████╗░░█████╗░██╗░░░██╗  ░█████╗░██╗░░░██╗████████╗░█████╗░███╗░░░███╗░█████╗░████████╗██╗░█████╗░███╗░░██╗
+╚██╗██╔╝██╔══██╗██╔══██╗╚██╗░██╔╝  ██╔══██╗██║░░░██║╚══██╔══╝██╔══██╗████╗░████║██╔══██╗╚══██╔══╝██║██╔══██╗████╗░██║
+░╚███╔╝░██████╔╝███████║░╚████╔╝░  ███████║██║░░░██║░░░██║░░░██║░░██║██╔████╔██║███████║░░░██║░░░██║██║░░██║██╔██╗██║
+░██╔██╗░██╔══██╗██╔══██║░░╚██╔╝░░  ██╔══██║██║░░░██║░░░██║░░░██║░░██║██║╚██╔╝██║██╔══██║░░░██║░░░██║██║░░██║██║╚████║
+██╔╝╚██╗██║░░██║██║░░██║░░░██║░░░  ██║░░██║╚██████╔╝░░░██║░░░╚█████╔╝██║░╚═╝░██║██║░░██║░░░██║░░░██║╚█████╔╝██║░╚███║
+╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░  ╚═╝░░╚═╝░╚═════╝░░░░╚═╝░░░░╚════╝░╚═╝░░░░░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░╚═╝░╚════╝░╚═╝░░╚══╝
+    """)
+
 def scan_domain(domain, output_file):
     print(f"Scanning {domain}...")
 
-    # Menentukan path folder tujuan
-    output_folder = "/mnt/d/BUG HUNTING/HASIL XRAY TOOLS"
+    # Path folder output untuk menyimpan hasil di Windows (dengan format path WSL)
+    output_folder = "/mnt/d/HASIL XRAY TOOLS"
     
     # Pastikan folder tujuan ada
     if not os.path.exists(output_folder):
@@ -31,7 +42,23 @@ def scan_domain(domain, output_file):
         print(f"Error during Xray scan: {e}")
         print(f"Output: {e.output}")
 
+def scan_subdomains(file_path):
+    # Membaca subdomain dari file dan melakukan pemindaian untuk setiap subdomain
+    try:
+        with open(file_path, 'r') as f:
+            domains = f.readlines()
+        
+        for domain in domains:
+            domain = domain.strip()  # Menghapus whitespace dan newline
+            if domain:
+                output_file = f"{domain}_scan_result.html"
+                scan_domain(domain, output_file)
+    except FileNotFoundError:
+        print(f"File {file_path} not found. Please check the file path.")
+
 def main():
+    display_message()  # Menampilkan pesan ASCII
+
     print("Choose an option:")
     print("1. Scan a single domain")
     print("2. Scan subdomains from a file")
@@ -46,8 +73,8 @@ def main():
         
         scan_domain(domain, output_file)
     elif choice == "2":
-        # Logika untuk scan subdomain dari file bisa ditambahkan di sini
-        pass
+        file_path = input("Enter the path of the file containing subdomains (e.g. 'subdomains.txt'): ")
+        scan_subdomains(file_path)
     elif choice == "3":
         print("Exiting...")
         exit()
